@@ -129,15 +129,22 @@ async function createPage(title: string, blocks: Array<IBatchBlock>) {
         // the correct flow because we are using createFirstBlock: false
         const firstBlock = await logseq.Editor.insertBlock(page!.originalName, blocks[0].content, {
             before: false,
-            isPageBlock: true
+            isPageBlock: false
+            // isPageBlock: true
         })
-        await logseq.Editor.insertBatchBlock(firstBlock!.uuid, blocks.slice(1), {sibling: true})
+        await logseq.Editor.insertBatchBlock(firstBlock!.uuid, blocks.slice(1), {
+            sibling: false,
+            before: true,
+            keepUUID: true})
         return page
     } else if (pageBlocksTree !== null && pageBlocksTree.length === 1) {
         // createFirstBlock: false creates a block to title if the name contains invalid characters
         const _first = pageBlocksTree[0]
         await logseq.Editor.updateBlock(_first!.uuid, _first.content + "\n" + blocks[0].content)
-        await logseq.Editor.insertBatchBlock(_first!.uuid, blocks.slice(1), {sibling: true})
+        await logseq.Editor.insertBatchBlock(_first!.uuid, blocks.slice(1), {
+            sibling: false,
+            before: true,
+            keepUUID: true})
         return page
     }
     logseq.App.showMsg(`Error creating "${title}", page not created`, "warning")
